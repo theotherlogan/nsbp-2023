@@ -74,7 +74,7 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
 
 # TODO: check that these are spitting out the right deliverables.
-    def hmf(self, z: float, independent_var: str = 'Mpeak', bins: np.ndarray = np.linspace(5,11,10)):
+    def hmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10)):
         '''
         Returns the isolated halo mass function for a given redshift.
         '''
@@ -82,12 +82,12 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         dist_ind_cdm = halos['Mvir']/0.7 > 1.2e8 # mass and particle cut, by index
 
-        values, base = np.histogram(np.log10(halos[independent_var][dist_ind_cdm]/0.7), bins=bins)
+        values, base = np.histogram(np.log10(halos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
         cumulative_values = np.cumsum(values)
 
         return values, cumulative_values, base
     
-    def hmf_plottables(self, z: float, independent_var: str = 'Mpeak', bins: np.ndarray = np.linspace(5,11,10)):
+    def hmf_plottables(self, z: float, bins: np.ndarray = np.linspace(5,11,10)):
         '''
         Returns the x and y values for the isolated halo mass function for a given redshift.
         '''
@@ -95,12 +95,12 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         dist_ind_cdm = halos['Mvir']/0.7 > 1.2e8 # mass and particle cut, by index
 
-        values, base = np.histogram(np.log10(halos[independent_var][dist_ind_cdm]/0.7), bins=bins)
+        values, base = np.histogram(np.log10(halos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
         cumulative_values = np.cumsum(values)
 
-        return base[1:], len(halos[independent_var][dist_ind_cdm])-cumulative_values
+        return base[1:], len(halos['Mpeak'][dist_ind_cdm])-cumulative_values
 
-    def shmf(self, z: float, independent_var: str = 'Mpeak', bins: np.ndarray = np.linspace(5,11,10)):
+    def shmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10)):
         '''
         Returns the subhalo mass function for a given redshift.
         '''
@@ -108,12 +108,12 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         dist_ind_cdm = subhalos['Mvir']/0.7 > 1.2e8 # mass and particle cut, by index
 
-        values, base = np.histogram(np.log10(subhalos[independent_var][dist_ind_cdm]/0.7), bins=bins)
+        values, base = np.histogram(np.log10(subhalos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
         cumulative_values = np.cumsum(values)
 
         return values, cumulative_values, base
     
-    def shmf_plottables(self, z: float, independent_var: str = 'Mpeak', bins: np.ndarray = np.linspace(5,11,10)):
+    def shmf_plottables(self, z: float, bins: np.ndarray = np.linspace(5,11,10)):
         '''
         Returns the x and y values for the subhalo mass function for a given redshift.
         '''
@@ -121,7 +121,7 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         dist_ind_cdm = subhalos['Mvir']/0.7 > 1.2e8 # mass and particle cut, by index
 
-        values, base = np.histogram(np.log10(subhalos[independent_var][dist_ind_cdm]/0.7), bins=bins)
+        values, base = np.histogram(np.log10(subhalos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
         cumulative_values = np.cumsum(values)
 
-        return base[1:], len(subhalos[independent_var][dist_ind_cdm])-cumulative_values
+        return base[1:], len(subhalos['Mpeak'][dist_ind_cdm])-cumulative_values
