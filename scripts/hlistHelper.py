@@ -41,7 +41,7 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
         # TODO: fix this; need host halo id at minimum (also need mass accretion history -> maybe a method for this?)
         pass
 
-    def extract_halos(self, a: float) -> np.ndarray:
+    def extract_halos(self, a: float, get_host_ind: bool = False) -> np.ndarray:
         '''
         Extracts the halo population from a given main host branch and returns the isolated halo population and subhalo population.
         '''
@@ -54,23 +54,26 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
         host_ind = np.argmin(np.abs(self.hmb['scale'] - a)) # smallest difference between hmb and desired scale factor.
         subhalos = halos[halos['upid'] == self.hmb[host_ind]['id']]
         ###
-        return isolated_halos, subhalos
+        if get_host_ind:
+            return isolated_halos, subhalos, host_ind
+        else:
+            return isolated_halos, subhalos
 
-    def get_z(self, z: float) -> np.ndarray:
+    def get_z(self, z: float, get_host_ind: bool = False) -> np.ndarray:
         '''
         Returns the isolated halo population and subhalo population for a given redshift (z) using the closest absolute value of z in the hlist dictionary.
         '''
 
-        return self.get_a( 1.0 / (1.0 + z) )
+        return self.get_a( 1.0 / (1.0 + z), get_host_ind )
 
-    def get_a(self, a: float) -> np.ndarray:
+    def get_a(self, a: float, get_host_ind: bool = False) -> np.ndarray:
         '''
         Returns the isolated halo population and subhalo population for a given scale (a) using the closest absolute value of a in the hlist dictionary.
         '''
         scale_factors = np.array(list(self.dict.keys())) # list of scale factors
         scale = scale_factors[np.argmin(np.abs(scale_factors - a))] # closest scale factor
 
-        return self.extract_halos(scale)
+        return self.extract_halos(scale, get_host_ind)
 
 
 # TODO: check that these are spitting out the right deliverables.
