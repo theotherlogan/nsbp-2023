@@ -5,6 +5,8 @@ from helpers.SimulationAnalysis import SimulationAnalysis, readHlist
 
 class hlist():
 
+    #TODO: fix this library to reflect the correct path structure for the cluster.
+
     '''
 A helper class intended to read and manipulate uncompressed halo lists (hlists) produced by the Rockstar halo finder. This expands on the helper scripts found here: https://bitbucket.org/yymao/helpers/src/master/.
 '''
