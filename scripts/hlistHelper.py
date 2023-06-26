@@ -5,22 +5,35 @@ from helpers.SimulationAnalysis import SimulationAnalysis, readHlist
 
 class hlist():
 
-    #TODO: fix this library to reflect the correct path structure for the cluster.
-
     '''
 A helper class intended to read and manipulate uncompressed halo lists (hlists) produced by the Rockstar halo finder. This expands on the helper scripts found here: https://bitbucket.org/yymao/helpers/src/master/.
 '''
 
-    def __init__(self, PATH: str = '/central/groups/carnegie_poc/enadler/ncdm_resims/', halo_num: str = '001', model: str = 'cdm', hmb: np.ndarray = []) -> None:
+    def __init__(self, PATH: str = '/central/groups/carnegie_poc/enadler/ncdm_resims/', halo_id: str = 'Halo004', model: str = 'cdm', hmb: np.ndarray = []) -> None:
 
-        # TODO: come back and check this path structure once we have server access
         #...... can always add other admin/internal parameters here later.
-        self.PATH = os.path.join(PATH, halo_num, f'hlists_{model}') # sets total path
-        self.halo_num = halo_num
+        
+        #...... internal path has been updated for cluster!
+        if model == 'cdm':
+            self.PATH = os.path.join(PATH, halo_id, model, 'output/rockstar/hlists') # sets total path
+        else:
+            self.PATH = os.path.join(PATH, halo_id, model, f'output_{model}/rockstar/hlists') # sets total path
+        
+        self.halo_id = halo_id
         self.model = model
-        self.dict = {} # questionable naming here?
+        self.dict = {}
+        
+        #...... this has now been updated to pull the correct compressed data archive from the cluster.
         self.hmb = hmb # can be set during initialization or extracted later on.
+        
+        #...... storing the corresponding cdm model within the data object (only if the model is not cdm) for comparison/future expansion.
+        if model == 'cdm':
+            self.cdm = None
+        else:
+            self.cdm = hlist(self.PATH, self.halo_id, 'cdm')
+            
 
+            
     def load_hlists(self) -> bool:
         '''
         Loads the halo lists from a given path, halo, and dark matter model and sorts them into a dictionary by scale factor. Note that the default model is CDM.
@@ -36,12 +49,23 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
         return True if self.dict != {} else False
         
 
-    def extract_main_branch(self) -> None:
+        
+    def load_hmb(self, high_res: bool = False) -> None:
         '''
         Extracts the main branch of the host halo, or the most 'recent' snapshot of the host galaxy and the surrounding halo (z = 0; a = 1).
         '''
-        # TODO: fix this; need host halo id at minimum (also need mass accretion history -> maybe a method for this?)
-        pass
+        # sets the path based on simulation resolution (defualt is 8K)
+        if high_res:
+            PATH = '/central/groups/carnegie_poc/enadler/ncdm_resims/analysis/sim_data_16K.bin'
+        else:
+            PATH = '/central/groups/carnegie_poc/enadler/ncdm_resims/analysis/sim_data.bin'
+            
+        with open(PATH, "rb") as f:
+            sim_data = pickle.load(f, encoding='latin1')
+            
+        self.hmb = sim_data[self.halo_id][self.model][0] # sets hmb
+           
+            
 
     def extract_halos(self, a: float, get_host_ind: bool = False) -> np.ndarray:
         '''
@@ -61,6 +85,8 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
         else:
             return isolated_halos, subhalos
 
+        
+        
     def get_z(self, z: float, get_host_ind: bool = False) -> np.ndarray:
         '''
         Returns the isolated halo population and subhalo population for a given redshift (z) using the closest absolute value of z in the hlist dictionary.
@@ -68,6 +94,8 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         return self.get_a( 1.0 / (1.0 + z), get_host_ind )
 
+    
+    
     def get_a(self, a: float, get_host_ind: bool = False) -> np.ndarray:
         '''
         Returns the isolated halo population and subhalo population for a given scale (a) using the closest absolute value of a in the hlist dictionary.
@@ -78,7 +106,7 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
         return self.extract_halos(scale, get_host_ind)
 
 
-# TODO: check that these are spitting out the right deliverables.
+    
     def hmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10), return_masscut_idx: bool = False):
         '''
         Returns the isolated halo mass function for a given redshift.
@@ -95,6 +123,8 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
         else:
             return values, cumulative_values, base
     
+    
+    
     def hmf_plottables(self, z: float, bins: np.ndarray = np.linspace(5,11,10)):
         '''
         Returns the x and y values for the isolated halo mass function for a given redshift.
@@ -108,6 +138,8 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         return base[1:], len(halos['Mpeak'][dist_ind_cdm])-cumulative_values
 
+    
+    
     def shmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10), return_masscut_idx: bool = False):
         '''
         Returns the subhalo mass function for a given redshift.
@@ -123,6 +155,8 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
             return values, cumulative_values, base, dist_ind_cdm
         else:
             return values, cumulative_values, base
+    
+    
     
     def shmf_plottables(self, z: float, bins: np.ndarray = np.linspace(5,11,10)):
         '''
