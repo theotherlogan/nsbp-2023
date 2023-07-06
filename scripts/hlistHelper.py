@@ -110,7 +110,7 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
 
     
-    def hmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10), return_masscut_idx: bool = False):
+    def hmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10), return_masscut_idx: bool = False, log_mass: bool = True):
         '''
         Returns the isolated halo mass function for a given redshift.
         '''
@@ -118,7 +118,11 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         dist_ind_cdm = halos['Mvir']/0.7 > 1.2e8 # mass and particle cut, by index
 
-        values, base = np.histogram(np.log10(halos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
+        if log_mass:
+            values, base = np.histogram(np.log10(halos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
+        else:
+            values, base = np.histogram(halos['Mpeak'][dist_ind_cdm]/0.7, bins=bins)
+            
         cumulative_values = np.cumsum(values)
 
         if return_masscut_idx:
@@ -143,7 +147,7 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
     
     
-    def shmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10), return_masscut_idx: bool = False):
+    def shmf(self, z: float, bins: np.ndarray = np.linspace(5,11,10), return_masscut_idx: bool = False, log_mass: bool = True):
         '''
         Returns the subhalo mass function for a given redshift.
         '''
@@ -151,7 +155,11 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
 
         dist_ind_cdm = subhalos['Mvir']/0.7 > 1.2e8 # mass and particle cut, by index
 
-        values, base = np.histogram(np.log10(subhalos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
+        if log_mass:
+            values, base = np.histogram(np.log10(subhalos['Mpeak'][dist_ind_cdm]/0.7), bins=bins)
+        else:
+            values, base = np.histogram(subhalos['Mpeak'][dist_ind_cdm]/0.7, bins=bins)
+            
         cumulative_values = np.cumsum(values)
 
         if return_masscut_idx:
