@@ -67,7 +67,17 @@ A helper class intended to read and manipulate uncompressed halo lists (hlists) 
             sim_data = pickle.load(f, encoding='latin1')
             
         self.hmb = sim_data[self.halo_id][self.model][0] # sets hmb
-           
+        
+    def extract_raw_halos(self, z: float,) -> np.ndarray:
+        '''
+        Extracts the raw halo population from a given redshift halo list.
+        '''
+        a = 1./(1. + z)
+        
+        scale_factors = np.array(list(self.dict.keys())) # list of scale factors
+        scale = scale_factors[np.argmin(np.abs(scale_factors - a))] # closest scale factor
+        
+        return readHlist(os.path.join(self.PATH, self.dict[scale]))
             
 
     def extract_halos(self, a: float, get_host_ind: bool = False) -> np.ndarray:
