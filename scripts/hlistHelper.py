@@ -9,16 +9,22 @@ class hlist():
 A helper class intended to read and manipulate uncompressed halo lists (hlists) produced by the Rockstar halo finder. This expands on the helper scripts found here: https://bitbucket.org/yymao/helpers/src/master/.
 '''
 
-    def __init__(self, PATH: str = '/central/groups/carnegie_poc/enadler/ncdm_resims/', halo_id: str = 'Halo004', model: str = 'cdm', hmb: np.ndarray = [], on_cluster: bool = True) -> None:
+    def __init__(self, PATH: str = '/central/groups/carnegie_poc/enadler/ncdm_resims/', halo_id: str = 'Halo004', model: str = 'cdm', hmb: np.ndarray = [], on_cluster: bool = True, high_resolution: bool = False) -> None:
 
         #...... can always add other admin/internal parameters here later.
         
         #...... internal path has been updated for cluster!
         if on_cluster:
-            if model == 'cdm':
-                self.PATH = os.path.join(PATH, halo_id, model, 'output/rockstar/hlists') # sets total path
-            else:
-                self.PATH = os.path.join(PATH, halo_id, model, f'output_{model}/rockstar/hlists') # sets total path
+            if high_resolution:
+                if model == 'cdm':
+                    self.PATH = os.path.join(PATH, halo_id, f'{model}_16K', 'output/rockstar/hlists') # sets total path
+                else:
+                    self.PATH = os.path.join(PATH, halo_id, f'{model}_16K', f'output_{model}/rockstar/hlists') # sets total path
+            else: 
+                if model == 'cdm':
+                    self.PATH = os.path.join(PATH, halo_id, model, 'output/rockstar/hlists') # sets total path
+                else:
+                    self.PATH = os.path.join(PATH, halo_id, model, f'output_{model}/rockstar/hlists') # sets total path
         else:
             self.PATH = os.path.join('../data', f'hlists_{model}')
 
